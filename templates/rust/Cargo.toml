@@ -1,0 +1,11 @@
+[package]
+name = "{{project-name}}"
+description = "Advent of code problem {{year}} #{{day}}: {{title}}"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aoc = { path = '../../aoc'}
+nom.workspace = true
+anyhow.workspace = true
+tracing.workspace = true

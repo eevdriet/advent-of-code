@@ -1,0 +1,48 @@
+# --- Data --- #
+/data
+
+# --- Rust --- #
+# Compilation files
+Cargo.lock
+target/
+debug/
+
+# Analyzer
+rust-analyzer/
+rust-project.json
+
+# --- Python --- #
+# Compilation files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+.Python
+.eggs/
+.installed.cfg
+MANIFEST
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+share/python-wheels/
+var/
+wheels/
+
+# Testing
+.pytest_cache
+
+# -- Environment --- #
+.env*
+.venv*
+env*/
+venv*/
+

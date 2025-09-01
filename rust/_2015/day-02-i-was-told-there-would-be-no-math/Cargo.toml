@@ -1,0 +1,11 @@
+[package]
+name = "day-02-i-was-told-there-would-be-no-math"
+description = "Advent of code problem 2015 #2: I Was Told There Would Be No Math"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aoc = { path = '../../aoc'}
+nom.workspace = true
+anyhow.workspace = true
+tracing.workspace = true

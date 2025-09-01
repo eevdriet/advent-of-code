@@ -1,0 +1,11 @@
+[package]
+name = "day-17-no-such-thing-as-too-much"
+description = "Advent of code problem 2015 #17: No Such Thing as Too Much"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aoc = { path = '../../aoc'}
+nom.workspace = true
+anyhow.workspace = true
+tracing.workspace = true

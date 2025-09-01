@@ -1,0 +1,12 @@
+[package]
+name = "day-04-the-ideal-stocking-stuffer"
+description = "Advent of code problem 2015 #4: The Ideal Stocking Stuffer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aoc = { path = '../../aoc'}
+nom.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+md-5 = "0.10.6"

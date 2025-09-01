@@ -1,0 +1,11 @@
+[package]
+name = "day-02-cube-conundrum"
+description = "Advent of code problem 2023 #2: Cube Conundrum"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aoc = { path = '../../aoc'}
+nom.workspace = true
+anyhow.workspace = true
+tracing.workspace = true

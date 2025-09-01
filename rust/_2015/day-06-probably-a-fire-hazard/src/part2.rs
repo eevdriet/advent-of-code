@@ -1,0 +1,32 @@
+use std::collections::HashMap;
+
+use crate::{Instruction, SwitchType};
+
+pub fn solve(instructions: &[Instruction]) -> isize {
+    instructions
+        .iter()
+        .fold(HashMap::new(), |mut turned_lights, instruction| {
+            let (x1, y1) = instruction.start;
+            let (x2, y2) = instruction.end;
+
+            let (xmin, xmax) = (x1.min(x2), x1.max(x2));
+            let (ymin, ymax) = (y1.min(y2), y1.max(y2));
+
+            for x in xmin..=xmax {
+                for y in ymin..=ymax {
+                    let pos = (x, y);
+
+                    let entry = turned_lights.entry(pos).or_insert(0isize);
+                    *entry = match instruction.switch {
+                        SwitchType::On => *entry + 1,
+                        SwitchType::Toggle => *entry + 2,
+                        SwitchType::Off => std::cmp::max(0, *entry - 1),
+                    }
+                }
+            }
+
+            turned_lights
+        })
+        .values()
+        .sum()
+}

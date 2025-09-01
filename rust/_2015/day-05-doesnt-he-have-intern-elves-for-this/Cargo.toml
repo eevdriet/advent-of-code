@@ -1,0 +1,11 @@
+[package]
+name = "day-05-doesnt-he-have-intern-elves-for-this"
+description = "Advent of code problem 2015 #5: Doesn't He Have Intern-Elves For This?"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aoc = { path = '../../aoc'}
+nom.workspace = true
+anyhow.workspace = true
+tracing.workspace = true

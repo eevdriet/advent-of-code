@@ -1,0 +1,11 @@
+[package]
+name = "day-03-perfectly-spherical-houses-in-a-vacuum"
+description = "Advent of code problem 2015 #3: Perfectly Spherical Houses in a Vacuum"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aoc = { path = '../../aoc'}
+nom.workspace = true
+anyhow.workspace = true
+tracing.workspace = true

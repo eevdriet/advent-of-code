@@ -1,0 +1,11 @@
+[package]
+name = "day-01-not-quite-lisp"
+description = "Advent of code problem 2015 #1: Not Quite Lisp"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aoc = { path = '../../aoc'}
+nom.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
