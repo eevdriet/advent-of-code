@@ -20,10 +20,9 @@ def test_examples(depth, target, expected):
 
 def test_input1(data):
     input = data("input")
-    assert part1(*input) == ...
+    assert part1(*input) == 7743
 
 
-@pytest.mark.skip(reason="Skip until solution to part 1 found through AOC")
 def test_input2(data):
     input = data("input")
-    assert part2(input) == ...
+    assert part2(*input) == 1029

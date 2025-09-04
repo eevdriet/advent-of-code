@@ -1,7 +1,7 @@
 import sys
 from collections import defaultdict, deque
 
-import networkx
+import networkx as nx
 
 from aoc.util import timed
 
@@ -17,9 +17,9 @@ DIRS = {
 }
 
 
-def parse(regex: str) -> networkx.Graph:
+def parse(regex: str) -> nx.Graph:
     regex = regex.strip("^$")
-    graph = networkx.Graph()
+    graph = nx.Graph()
 
     stack = []
 
@@ -49,13 +49,13 @@ def parse(regex: str) -> networkx.Graph:
     return graph
 
 
-def part1(graph: networkx.Graph) -> int:
-    paths = networkx.algorithms.shortest_path_length(graph, 0)
+def part1(graph: nx.Graph) -> int:
+    paths = nx.algorithms.shortest_path_length(graph, 0)
     return max(paths.values())
 
 
-def part2(graph: networkx.Graph) -> int:
-    paths = networkx.algorithms.shortest_path_length(graph, 0)
+def part2(graph: nx.Graph) -> int:
+    paths = nx.algorithms.shortest_path_length(graph, 0)
     return sum(1 for path_len in paths.values() if path_len >= 1000)
 
 
