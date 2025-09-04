@@ -24,7 +24,7 @@ def part1(n_elves: int) -> int:
     return neighbor(n_elves)
 
 
-def part3(n_elves: int) -> int:
+def part2(n_elves: int) -> int:
     # Keep track of all elves in both halves
     # This makes it easy to steal from across the circle (leftmost takes rightmost)
     left = deque()
