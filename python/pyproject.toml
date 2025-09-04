@@ -3,13 +3,19 @@ name = "aoc"
 version = "0.1.0"
 description = "Python package for the Advent of Code challenges"
 readme = "../README.md"
-authors = [
-    { name = "Eertze van de Riet", email = "eertze.0@gmail.com" }
-]
+authors = [ { name = "Eertze van de Riet", email = "eertze.0@gmail.com" } ]
 requires-python = ">=3.13"
 dependencies = [
-    "networkx>=3.5",
-]
+ "attrs>=25.3.0",
+ "bs4>=0.0.2",
+ "dotenv>=0.9.9",
+ "html2text>=2025.4.15",
+ "networkx>=3.5",
+ "numpy>=2.3.2",
+ "parse>=1.20.2",
+ "requests>=2.32.5",
+ "templater",
+    ]
 
 [project.scripts]
 aoc = "aoc:main"
@@ -17,3 +23,12 @@ aoc = "aoc:main"
 [build-system]
 requires = ["uv_build>=0.8.13,<0.9.0"]
 build-backend = "uv_build"
+
+[tool.uv.sources]
+templater = { path = "../../templater", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-watch>=4.2.0",
+    ]
