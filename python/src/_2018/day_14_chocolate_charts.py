@@ -28,19 +28,17 @@ def part1(recipe_str: str) -> str:
     return score[n_recipes : n_recipes + 10]
 
 
-def part2(recipe_str: str) -> int:
+def part2(recipes: str) -> int:
     score = "37"
-    elves = [0, 1]
+    elf1 = 0
+    elf2 = 1
 
-    while recipe_str not in score[-7:]:
-        # Determine the new recipe(s) score and add them
-        score += str(sum(int(score[elf]) for elf in elves))
+    while recipes not in score[-7:]:
+        score += str(int(score[elf1]) + int(score[elf2]))
+        elf1 = (elf1 + int(score[elf1]) + 1) % len(score)
+        elf2 = (elf2 + int(score[elf2]) + 1) % len(score)
 
-        # Move the elves forward through the recipes
-        for idx, elf in enumerate(elves):
-            elves[idx] = (elf + 1 + int(score[elf])) % len(score)
-
-    return score.index(recipe_str)
+    return score.index(recipes)
 
 
 def main():
@@ -55,4 +53,4 @@ def main():
 
 
 if __name__ == "__main__":
-    part1(20)
+    part2("556061")
