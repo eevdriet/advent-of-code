@@ -8,7 +8,7 @@ from pathlib import Path
 from templater.create import create_file
 from templater.props import props_list
 
-VAULT_PATH = Path.home() / "Sandbox"
+VAULT_PATH = Path.home() / "Notes"
 ROOT_PATH = Path(__file__).parent.parent
 DATA_PATH = ROOT_PATH / "data"
 TEMPLATE_PATH = ROOT_PATH / "templates"
@@ -58,8 +58,12 @@ def main():
         print(f"Path with problem information {info_path} doesn't exist")
         sys.exit(1)
 
-    with open(info_path, "r") as file:
-        info = json.load(file)
+    try:
+        with open(info_path, "r") as file:
+            info = json.load(file)
+    except json.JSONDecodeError:
+        print(f"Could read JSON file {file.read()}")
+        sys.exit(1)
 
     info["aoc_date"] = f"{info["year"]}-12-{info["padded_day"]}"
 

@@ -21,9 +21,9 @@ HEADERS = {"Cookie": f"session={SESSION}", "User-Agent": "github.com/eevdriet"}
 class MarkdownConverter(HTML2Text):
     def __init__(self):
         super().__init__()
-        self.body_width = 0
-        self.ignore_links = False
-        self.backquote_code_style = True
+        self.body_width: int = 0
+        self.ignore_links: bool = False
+        self.backquote_code_style: bool = True
 
 
 def fetch_input(year: int, day: int):

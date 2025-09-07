@@ -3,6 +3,7 @@ curr_year := `date +%Y`
 
 get day=curr_day year=curr_year:
     #!/usr/bin/env bash
+    source "{{justfile_directory()}}/python/.venv/bin/activate"
 
     INFO_FILE="{{justfile_directory()}}/data/{{year}}/{{day}}.json"
     python "{{justfile_directory()}}/scripts/get_input.py" --day {{day}} --year {{year}} > $INFO_FILE
