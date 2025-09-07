@@ -10,7 +10,7 @@ get day=curr_day year=curr_year:
 create day=curr_day year=curr_year +languages='rust':
     #!/usr/bin/env bash
 
-    source "{{justfile_directory()}}/python/venv/bin/activate"
+    source "{{justfile_directory()}}/python/.venv/bin/activate"
 
     # Get input, examples and problem statement
     just get {{day}} {{year}}

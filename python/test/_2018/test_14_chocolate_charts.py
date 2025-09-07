@@ -36,4 +36,4 @@ def test_examples2(recipe_str, expected):
 
 def test_input2(data):
     input = data("input")
-    assert part2(input) == ...
+    assert part2(input) == "20307394"

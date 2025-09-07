@@ -4,13 +4,9 @@ from _2018.day_20_a_regular_map import parse, part1, part2
 from aoc.io import open_file
 
 
-@pytest.fixture
-def data():
-    def _load(name: str):
-        with open_file(2018, 20, name=name) as file:
-            return parse(file.read())
-
-    return _load
+def data(name:str):
+    with open_file(2018, 20, name=name) as file:
+        return parse(file.read())
 
 
 @pytest.mark.parametrize(
@@ -23,15 +19,15 @@ def data():
         ("^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$", 31),
     ],
 )
-def test_examples1(regex, expected):
+def test_examples1(regex: str, expected: int):
     assert part1(parse(regex)) == expected
 
 
-def test_input1(data):
+def test_input1():
     input = data("input")
     assert part1(input) == 3560
 
 
-def test_input2(data):
+def test_input2():
     input = data("input")
     assert part2(input) == 8688
