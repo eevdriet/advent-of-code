@@ -64,7 +64,7 @@ def main():
     info["aoc_date"] = f"{info["year"]}-12-{info["padded_day"]}"
 
     # Alias each problem with its index
-    info["aliases"] = props_list([f"Advent of code {year} #{day}", info["title"]])
+    info["aliases"] = props_list([info["title"], f"Advent of code {year} #{day}"])
 
     # Determine which languages have defined templates
     languages = [f"[[{LANGUAGE_NOTES[l]}]]" for l in languages if l in LANGUAGE_NOTES]
