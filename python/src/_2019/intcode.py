@@ -35,10 +35,14 @@ class IntCode:
                 return param
             case 2:
                 return param + self.rel_base
+            case _:
+                raise ValueError(f"invalid mode {mode} for write parameter")
 
-        raise ValueError(f"invalid mode {mode} for write parameter")
+    def run(
+        self, inputs: list[int] | None = None, *, pause_at_output: bool = False
+    ) -> list[int]:
+        inputs = inputs if inputs else []
 
-    def run(self, inputs: list[int], *, pause_at_output: bool = False) -> list[int]:
         if self.status == Status.IDLE:
             self.status = Status.RUNNING
 

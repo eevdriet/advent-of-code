@@ -1,6 +1,6 @@
 import sys
 
-from _2019.day_09_sensor_boost import IntCode
+from _2019.intcode import IntCode, Status
 from aoc.io import read_file
 from aoc.util import timed
 
@@ -11,7 +11,7 @@ def parse(input: str) -> list[int]:
 
 def part1(nums: list[int]) -> int:
     program = IntCode(nums)
-    outputs, _ = program.run([])
+    outputs = program.run([])
 
     return sum(1 for idx in range(2, len(outputs), 3) if outputs[idx] == 2)
 
@@ -27,7 +27,7 @@ def part2(nums: list[int]) -> int:
 
     while True:
         # Run the program until it expects another input or halts
-        outputs, has_halted = program.run([input])
+        outputs = program.run([input])
         assert len(outputs) % 3 == 0
 
         # Go through the output to update the score / coordinates
@@ -43,7 +43,7 @@ def part2(nums: list[int]) -> int:
                     x_ball = x
 
         # Stop running the program after it's halted
-        if has_halted:
+        if program.status == Status.HALTED:
             break
 
         # Determine next output based on the ball and paddle coordinates
