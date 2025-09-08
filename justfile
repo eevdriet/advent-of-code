@@ -1,20 +1,19 @@
 curr_day := `date +%d`
 curr_year := `date +%Y`
 
-get day=curr_day year=curr_year:
-    #!/usr/bin/env bash
+get year=curr_year day=curr_day:
+    #!/usr/bin/bash
     source "{{justfile_directory()}}/python/.venv/bin/activate"
 
     INFO_FILE="{{justfile_directory()}}/data/{{year}}/{{day}}.json"
     python "{{justfile_directory()}}/scripts/get_input.py" --day {{day}} --year {{year}} > $INFO_FILE
 
-create day=curr_day year=curr_year +languages='rust':
-    #!/usr/bin/env bash
-
+create year=curr_year day=curr_day +languages='python':
+    #!/usr/bin/bash
     source "{{justfile_directory()}}/python/.venv/bin/activate"
 
     # Get input, examples and problem statement
-    just get {{day}} {{year}}
+    just get {{year}} {{day}}
 
     # Extract additional information
     INFO_FILE="{{justfile_directory()}}/data/{{year}}/{{day}}.json"
@@ -53,6 +52,23 @@ create day=curr_day year=curr_year +languages='rust':
 
     # Remove information file
     rm -f $INFO_FILE
+
+work year=curr_year day=curr_day:
+    #!/usr/bin/bash
+    source "{{justfile_directory()}}/python/.venv/bin/activate"
+
+    padded_day=$(printf "%02d" "{{day}}")
+    lang=$(basename "{{invocation_directory()}}")
+
+    case $lang in
+        # Use cargo generate
+        python)
+            uv run ptw . --now -- python/test/_{{year}}/test_$padded_day*
+            ;;
+        *)
+            echo "❌ Unsupported language: $lang"
+            ;;
+    esac
 
 work-rust day=curr_day part='1':
     #!/usr/bin/env bash
