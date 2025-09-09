@@ -53,36 +53,26 @@ create year=curr_year day=curr_day +languages='python':
     # Remove information file
     rm -f $INFO_FILE
 
-work year=curr_year day=curr_day:
-    #!/usr/bin/bash
-    source "{{justfile_directory()}}/python/.venv/bin/activate"
 
-    padded_day=$(printf "%02d" "{{day}}")
-    lang=$(basename "{{invocation_directory()}}")
+test year=curr_year day=curr_day part='1':
+    #!/usr/bin/bash
+    dir="{{invocation_directory()}}"
+    cd $dir || exit 1
+
+    padded_day=$(printf "%02d" $((10#{{day}})))
+    lang=$(basename $dir)
 
     case $lang in
-        # Use cargo generate
+        rust)
+            day_folder=$(ls $dir/_{{year}}/ | grep -E "^day-$padded_day")
+            echo "DAY_FO: $day_folder"
+            cargo watch -s "cargo nextest run -p $day_folder"
+            ;;
         python)
-            uv run ptw . --now -- python/test/_{{year}}/test_$padded_day*
+            source "{{justfile_directory()}}/python/.venv/bin/activate"
+            uv run ptw . --now -- $lang/test/_{{year}}/test_$padded_day*
             ;;
         *)
             echo "❌ Unsupported language: $lang"
             ;;
     esac
-
-work-rust day=curr_day part='1':
-    #!/usr/bin/env bash
-
-    # Extract information for the problem
-    padded_day=$(printf "%02d" {{day}})
-
-    cargo watch -w "${padded_day}*" -s "just test-rust {{day}} {{part}}"
-
-test-rust day=curr_day part='1':
-    #!/usr/bin/env bash
-
-    # Extract information for the problem
-    padded_day=$(printf "%02d" {{day}})
-
-    cargo nextest run -p "${padded_day}*" part{{part}}
-    

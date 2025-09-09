@@ -27,7 +27,7 @@ pub fn parse_gift(input: &str) -> IResult<&str, (&str, usize)> {
     Ok((input, (gift, amount as usize)))
 }
 
-pub fn parse_tape(input: &str) -> IResult<&str, TickerTape> {
+pub fn parse_tape(input: &str) -> IResult<&str, TickerTape<'_>> {
     // Initialize the tape from its identifier
     let (input, id) = delimited(tag("Sue "), complete::u32, tag(": "))(input)?;
 
@@ -45,6 +45,6 @@ pub fn parse_tape(input: &str) -> IResult<&str, TickerTape> {
     Ok((input, tape))
 }
 
-pub fn parse_tapes(input: &str) -> IResult<&str, Vec<TickerTape>> {
+pub fn parse_tapes(input: &str) -> IResult<&str, Vec<TickerTape<'_>>> {
     separated_list1(newline, parse_tape)(input)
 }
