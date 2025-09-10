@@ -1,8 +1,7 @@
 import sys
 from functools import reduce
 
-from _2019.day_17_set_and_forget import asciify
-from _2019.intcode import IntCode
+from _2019.intcode import IntCode, asciify
 from aoc.util import timed
 
 

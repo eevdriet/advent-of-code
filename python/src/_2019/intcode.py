@@ -10,12 +10,19 @@ class Status(Enum):
     PAUSED_AT_OUTPUT = auto()
 
 
+def asciify(input: str | list[str]) -> list[int]:
+    input = [input] if isinstance(input, str) else input
+    return [ord(letter) for letter in ",".join(input)] + [ord("\n")]
+
+
 class IntCode:
     def __init__(self, memory: list[int]):
-        self.mem = defaultdict(int, {idx: memory[idx] for idx in range(len(memory))})
-        self.rel_base = 0
-        self.ip = 0
-        self.status = Status.IDLE
+        self.mem: dict[int, int] = defaultdict(
+            int, {idx: memory[idx] for idx in range(len(memory))}
+        )
+        self.rel_base: int = 0
+        self.ip: int = 0
+        self.status: Status = Status.IDLE
 
     def _get(self, src: int, mode: int) -> int:
         match mode:
@@ -25,8 +32,8 @@ class IntCode:
                 return src
             case 2:
                 return self.mem[src + self.rel_base]
-
-        raise ValueError(f"bad mode {mode}")
+            case _:
+                raise ValueError(f"bad mode {mode}")
 
     def _get_addr(self, param: int, mode: int) -> int:
         """Resolve write-address depending on mode"""

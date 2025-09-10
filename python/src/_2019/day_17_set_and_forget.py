@@ -3,7 +3,7 @@ from typing import Generator, override
 
 from attrs import define
 
-from _2019.intcode import IntCode
+from _2019.intcode import IntCode, asciify
 from aoc.io import read_file
 from aoc.util import timed
 
@@ -166,10 +166,6 @@ def part1(memory: list[int]) -> int:
     )
 
 
-def asciify(input: list[str]) -> list[int]:
-    return [ord(letter) for letter in ",".join(input)] + [ord("\n")]
-
-
 def part2(memory: list[int]) -> int:
     # Retrieve the image and determine where the robot can start and go to
     image = Image.scan(memory.copy())
@@ -196,45 +192,6 @@ def part2(memory: list[int]) -> int:
 
     dust = cleaning_program.run(input)
     return dust[-1]
-
-
-def part3(memory: list[int]) -> int:
-    """
-    Feed the movement routines to the vacuum robot and return the total dust collected.
-    """
-    # 1️⃣ Wake up the robot
-    memory = memory.copy()
-    memory[0] = 2
-    robot = IntCode(memory)
-
-    # 2️⃣ Determine the path (manually or via image.clean_path)
-    # NOTE: Replace these with the sequences you determined
-    main_routine = ["B", "B", "A", "A", "A", "C", "B"]
-    routines = {
-        "A": ["L", "12", "L", "12", "R", "8", "R", "8", "R", "10", "R", "4", "R", "4"],
-        "B": ["R", "8", "L", "4", "R", "4", "R", "10", "R", "8"],
-        "C": ["R", "10", "R", "4", "R", "4"],
-    }
-
-    # 3️⃣ Convert routines to ASCII codes
-    def to_ascii(line: list[str]) -> list[int]:
-        # Join with commas, convert each char to ASCII, append newline
-        return [ord(c) for c in ",".join(line)] + [10]
-
-    # Prepare the full input sequence
-    input_codes = (
-        to_ascii(main_routine)
-        + to_ascii(routines["A"])
-        + to_ascii(routines["B"])
-        + to_ascii(routines["C"])
-        + [ord("n"), 10]  # no continuous video feed
-    )
-
-    # 4️⃣ Run the robot
-    outputs = robot.run(input_codes)
-
-    # 5️⃣ The dust collected is the last output
-    return outputs[-1]
 
 
 def main():
