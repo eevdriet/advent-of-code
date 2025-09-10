@@ -70,7 +70,7 @@ test year=curr_year day=curr_day part='1':
             ;;
         python)
             source "{{justfile_directory()}}/python/.venv/bin/activate"
-            uv run ptw . --now -- $lang/test/_{{year}}/test_$padded_day*
+            uv run ptw . --now -- test/_{{year}}/test_$padded_day*
             ;;
         *)
             echo "❌ Unsupported language: $lang"
