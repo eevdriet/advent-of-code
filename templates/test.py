@@ -8,9 +8,10 @@ def data(name: str):
         return parse(file.read())
 
 
-@pytest.mark.parametrize("xyz, expected", [])
-def test_examples(xyz, expected):
-    assert part1(xyz) == expected
+@pytest.mark.parametrize("n, expected", [])
+def test_examples(n: int, expected: int):
+    example = data(f"example{n}")
+    assert part1(example) == expected
 
 
 def test_input1():
