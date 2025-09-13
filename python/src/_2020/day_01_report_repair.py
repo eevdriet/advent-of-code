@@ -7,7 +7,7 @@ def parse(input: str) -> list[int]:
     return [int(num) for num in input.splitlines()]
 
 
-def part1(nums: list[int], target: int = 2020) -> int:
+def part1(nums: list[int], target: int = 2020) -> int | None:
     remainders = set()
 
     for num in nums:
@@ -17,7 +17,7 @@ def part1(nums: list[int], target: int = 2020) -> int:
 
         remainders.add(num)
 
-    raise RuntimeError(f"Could not create {target} from two numbers in {nums}")
+    return None
 
 
 def part2(nums: list[int], target: int = 2020) -> int:

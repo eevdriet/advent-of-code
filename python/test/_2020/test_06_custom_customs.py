@@ -14,4 +14,4 @@ def test_input1():
 
 def test_input2():
     input = data("input")
-    assert part2(input) == ...
+    assert part2(input) == 2971
