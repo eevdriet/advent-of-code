@@ -41,9 +41,6 @@ def main():
     result1, elapsed = timed(part1, *parsed)
     print(f"Part 1: {result1} ({elapsed} elapsed)")
 
-    result2, elapsed = timed(part2, *parsed)
-    print(f"Part 2: {result2} ({elapsed} elapsed)")
-
 
 if __name__ == "__main__":
     main()
