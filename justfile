@@ -8,7 +8,7 @@ get year=curr_year day=curr_day:
     INFO_FILE="{{justfile_directory()}}/data/{{year}}/{{day}}.json"
     python "{{justfile_directory()}}/scripts/get_input.py" --day {{day}} --year {{year}} > $INFO_FILE
 
-create year=curr_year day=curr_day +languages='python':
+create year=curr_year day=curr_day +languages='python': (get year day)
     #!/usr/bin/bash
     source "{{justfile_directory()}}/python/.venv/bin/activate"
 
@@ -54,7 +54,7 @@ create year=curr_year day=curr_day +languages='python':
     rm -f $INFO_FILE
 
 
-test year=curr_year day=curr_day part='1':
+test year=curr_year day=curr_day part='1': (create year day)
     #!/usr/bin/bash
     dir="{{invocation_directory()}}"
     cd $dir || exit 1

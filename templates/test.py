@@ -19,7 +19,12 @@ def test_input1():
     assert part1(input) == ...
 
 
-@pytest.mark.skip(reason="Skip until solution to part 1 found through AOC")
+@pytest.mark.parametrize("n, expected", [(0, ...)])
+def test_examples2(n: int, expected: int):
+    example = data(f"example{n if n else ''}")
+    assert part2(example) == expected
+
+
 def test_input2():
     input = data('input')
     assert part2(input) == ...
