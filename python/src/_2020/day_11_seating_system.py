@@ -1,10 +1,9 @@
 import sys
 from collections.abc import Generator
-from itertools import product
 from typing import Callable
 
 from aoc.io import read_file
-from aoc.util import timed
+from aoc.util import adjacent8, directions8, timed
 
 Seat = tuple[int, int]
 
@@ -40,18 +39,9 @@ def find_occupied_seats(
         seats = new_seats
 
 
-DIRECTIONS8 = [
-    (dr, dc) for dr, dc in product([-1, 0, 1], repeat=2) if dr != 0 or dc != 0
-]
-
-
 def part1(seats: dict[Seat, bool]) -> int:
     def neighbors(seat: Seat) -> Generator[Seat, None, None]:
-        row, col = seat
-
-        for dr, dc in DIRECTIONS8:
-            neighbor = row + dr, col + dc
-
+        for neighbor in adjacent8(seat):
             if neighbor in seats:
                 yield neighbor
 
@@ -65,7 +55,7 @@ def part2(seats: dict[Seat, bool]) -> int:
     def neighbors(seat: Seat) -> Generator[Seat, None, None]:
         row, col = seat
 
-        for dr, dc in DIRECTIONS8:
+        for dr, dc in directions8(seat):
             r = row + dr
             c = col + dc
 

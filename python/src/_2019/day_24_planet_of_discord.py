@@ -2,7 +2,7 @@ import sys
 from typing import Callable, Generator
 
 from aoc.io import read_file
-from aoc.util import timed
+from aoc.util import adjacent4, directions4, timed
 
 Coord = tuple[int, int]
 Bug = tuple[int, ...]
@@ -66,12 +66,7 @@ def part1(area: dict[Coord, str]) -> int:
     size = max(x for x, _ in area) + 1
 
     def neighbors(bug: Bug) -> Generator[Coord]:
-        x, y = bug
-
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nx = x + dx
-            ny = y + dy
-
+        for nx, ny in adjacent4(bug):
             if nx in range(size) and ny in range(size):
                 yield nx, ny
 
@@ -89,7 +84,7 @@ def part2(area: dict[Coord, str], n_minutes: int = 200) -> int:
     def neighbors(bug: Bug) -> Generator[Bug, None, None]:
         level, x, y = bug
 
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+        for dx, dy in directions4(bug):
             nx = x + dx
             ny = y + dy
 

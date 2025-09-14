@@ -1,13 +1,21 @@
 import time
+from collections.abc import Generator, Iterable, Iterator
 from itertools import chain, combinations, product
 from math import floor, log10
-from typing import (Callable, Generator, Iterable, Iterator, Optional,
-                    ParamSpec, Tuple, TypeVar, overload)
+from typing import (
+    Callable,
+    ParamSpec,
+    TypeVar,
+    overload,
+)
 
-Point = tuple[int, ...]
+Coord2D = complex | tuple[int, int]
+Coord = complex | tuple[int, ...]
+Direction = complex | tuple[int, ...]
 
 P = ParamSpec("P")
 R = TypeVar("R")
+T = TypeVar("T")
 
 
 @overload
@@ -18,7 +26,7 @@ def timed(func: Callable[P, R], *args: P.args, **kwargs: P.kwargs) -> tuple[R, s
 def timed(func: Callable[P, R]) -> Callable[P, tuple[R, str]]: ...
 
 
-def timed(func, *args, **kwargs):
+def timed(func: Callable, *args, **kwargs):
     def format_duration(seconds: float) -> str:
         if seconds >= 1:
             return f"{seconds:.3f} s"
@@ -40,7 +48,7 @@ def timed(func, *args, **kwargs):
     return wrapper(*args, **kwargs) if args or kwargs else wrapper
 
 
-def minmax(*items):
+def minmax(*items: list[T]):
     return min(items), max(items)
 
 
@@ -59,7 +67,7 @@ def ends_with(target: int, right: int) -> bool:
     return (target - right) % (10 ** n_digits(right)) == 0
 
 
-def partitions(total: int, n: int) -> Generator[Tuple[int, ...], None, None]:
+def partitions(total: int, n: int) -> Generator[tuple[int, ...], None, None]:
     if n == 2:
         for amount in range(total + 1):
             yield (amount, total - amount)
@@ -69,7 +77,7 @@ def partitions(total: int, n: int) -> Generator[Tuple[int, ...], None, None]:
                 yield (amount,) + partition
 
 
-def pairwise_sum(x: Point, y: Point) -> Point:
+def pairwise_sum(x: tuple[int, ...], y: tuple[int, ...]) -> tuple[int, ...]:
     """
     Compute the pairwise sum of two points
 
@@ -82,34 +90,145 @@ def pairwise_sum(x: Point, y: Point) -> Point:
     return tuple(map(sum, zip(x, y)))
 
 
-def adjacent4(point: Point) -> Iterator[Point]:
-    """
-    Generate points horizontally or vertically adjacent to a given point with variable dimension
+@overload
+def directions4(coord: complex) -> Generator[complex]: ...
+@overload
+def directions4(coord: tuple[int, int]) -> Generator[tuple[int, int]]: ...
+@overload
+def directions4(coord: tuple[int, int, int]) -> Generator[tuple[int, int, int]]: ...
+@overload
+def directions4(
+    coord: tuple[int, int, int, int],
+) -> Generator[tuple[int, int, int, int]]: ...
+@overload
+def directions4(coord: tuple[int, ...]) -> Generator[tuple[int, ...]]: ...
 
-    :param point: Point to find neighbors for
-    :yield: Points adjacent to the given point
-    """
-    for deltas in product((-1, 0, 1), repeat=len(point)):
-        if sum(delta != 0 for delta in deltas) != 1:
-            continue
 
-        yield pairwise_sum(point, deltas)
+def directions4(coord: Coord) -> Generator[Direction]:
+    if isinstance(coord, complex):
+        yield from [-1, 1, -1j, 1j]
+
+    elif isinstance(coord, tuple):
+        for deltas in product((-1, 0, 1), repeat=len(coord)):
+            if sum(delta != 0 for delta in deltas) != 1:
+                continue
+
+            yield deltas
+    else:
+        raise TypeError(f"Unsupported coordinate type: {type(coord)}")
 
 
-def adjacent8(point: Point, *, bounds: Optional[Point] = None) -> Iterator[Point]:
-    """
-    Generate points horizontally, vertically or diagonally adjacent to a given point with variable dimension
+@overload
+def directions8(coord: complex) -> Generator[complex]: ...
+@overload
+def directions8(coord: tuple[int, int]) -> Generator[tuple[int, int]]: ...
+@overload
+def directions8(coord: tuple[int, int, int]) -> Generator[tuple[int, int, int]]: ...
+@overload
+def directions8(
+    coord: tuple[int, int, int, int],
+) -> Generator[tuple[int, int, int, int]]: ...
+@overload
+def directions8(coord: tuple[int, ...]) -> Generator[tuple[int, ...]]: ...
 
-    :param point: Point to find neighbors for
-    :yield: Points adjacent to the given point
-    """
-    for deltas in product((-1, 0, 1), repeat=len(point)):
-        if all(delta == 0 for delta in deltas):
-            continue
 
-        result = pairwise_sum(point, deltas)
-        if bounds is None or all(0 <= dim < bound for dim, bound in zip(result, bounds)):
-            yield result
+def directions8(coord: Coord) -> Generator[Direction]:
+    if isinstance(coord, complex):
+        for deltas in product([-1, 0, 1], [-1j, 0j, 1j]):
+            if all(delta == 0 for delta in deltas):
+                continue
+
+            yield sum(deltas)
+
+    elif isinstance(coord, tuple):
+        for deltas in product((-1, 0, 1), repeat=len(coord)):
+            if all(delta == 0 for delta in deltas):
+                continue
+
+            yield deltas
+    else:
+        raise TypeError(f"Unsupported coordinate type: {type(coord)}")
+
+
+@overload
+def adjacent(
+    coord: complex, directions: Callable[[complex], Generator[complex]]
+) -> Generator[complex]: ...
+
+
+@overload
+def adjacent(
+    coord: tuple[int, int],
+    directions: Callable[[tuple[int, int]], Generator[tuple[int, int]]],
+) -> Generator[tuple[int, int]]: ...
+
+
+@overload
+def adjacent(
+    coord: tuple[int, int, int],
+    directions: Callable[[tuple[int, int, int]], Generator[tuple[int, int, int]]],
+) -> Generator[tuple[int, int, int]]: ...
+
+
+@overload
+def adjacent(
+    coord: tuple[int, int, int, int],
+    directions: Callable[
+        [tuple[int, int, int, int]], Generator[tuple[int, int, int, int]]
+    ],
+) -> Generator[tuple[int, int, int, int]]: ...
+
+
+def adjacent(
+    coord: Coord, directions: Callable[[Coord], Generator[Direction]]
+) -> Generator[Coord]:
+    for dir in directions(coord):
+        if isinstance(coord, complex) and isinstance(dir, complex):
+            yield coord + dir
+
+        elif isinstance(coord, tuple) and isinstance(dir, tuple):
+            yield pairwise_sum(coord, dir)
+
+        else:
+            raise TypeError(
+                f"Unsupported coordinate ({type(coord)}) and direction ({type(dir)}) type pair: "
+            )
+
+
+@overload
+def adjacent4(coord: complex) -> Generator[complex]: ...
+@overload
+def adjacent4(coord: tuple[int, int]) -> Generator[tuple[int, int]]: ...
+@overload
+def adjacent4(coord: tuple[int, int, int]) -> Generator[tuple[int, int, int]]: ...
+@overload
+def adjacent4(
+    coord: tuple[int, int, int, int],
+) -> Generator[tuple[int, int, int, int]]: ...
+@overload
+def adjacent4(coord: tuple[int, ...]) -> Generator[tuple[int, ...]]: ...
+
+
+def adjacent4(coord: Coord) -> Generator[Coord]:
+    return adjacent(coord, directions4)
+
+
+@overload
+def adjacent8(coord: complex) -> Generator[complex]: ...
+@overload
+def adjacent8(coord: tuple[int, int]) -> Generator[tuple[int, int]]: ...
+@overload
+def adjacent8(coord: tuple[int, int, int]) -> Generator[tuple[int, int, int]]: ...
+@overload
+def adjacent8(
+    coord: tuple[int, int, int, int],
+) -> Generator[tuple[int, int, int, int]]: ...
+@overload
+def adjacent8(coord: tuple[int, ...]) -> Generator[tuple[int, ...]]: ...
+
+
+def adjacent8(coord: Coord) -> Generator[Coord]:
+    return adjacent(coord, directions8)
 
 
 def combinations_xy(iterable: Iterable, rs: range) -> Iterator[tuple]:

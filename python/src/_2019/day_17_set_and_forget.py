@@ -1,11 +1,11 @@
 import sys
-from typing import Generator, override
+from typing import override
 
 from attrs import define
 
 from _2019.intcode import IntCode, asciify
 from aoc.io import read_file
-from aoc.util import timed
+from aoc.util import adjacent4, timed
 
 
 def parse(input: str) -> list[int]:
@@ -140,22 +140,13 @@ class Image(dict):
         return False, [], []
 
 
-def neighbors(coord: complex) -> Generator[complex, None, None]:
-    r, i = coord.real, coord.imag
-
-    yield complex(r - 1, i)
-    yield complex(r + 1, i)
-    yield complex(r, i - 1)
-    yield complex(r, i + 1)
-
-
 def part1(memory: list[int]) -> int:
     image = Image.scan(memory)
     intersections = {
         coord
         for coord, cell in image.items()
         if cell == "#"
-        and all(image.get(neighbor) == "#" for neighbor in neighbors(coord))
+        and all(image.get(neighbor) == "#" for neighbor in adjacent4(coord))
     }
 
     return int(

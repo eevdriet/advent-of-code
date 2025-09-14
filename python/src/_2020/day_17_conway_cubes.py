@@ -1,9 +1,7 @@
 import sys
 from collections import defaultdict
-from collections.abc import Generator
-from itertools import product
 
-from aoc.util import timed
+from aoc.util import adjacent8, timed
 
 Cube2D = tuple[int, int]
 Cube = tuple[int, ...]
@@ -18,16 +16,6 @@ def parse(input: str) -> set[Cube2D]:
     }
 
 
-def neighbors(cube: Cube) -> Generator[Cube, None, None]:
-    n_dims = len(cube)
-
-    for diffs in product([-1, 0, 1], repeat=n_dims):
-        if all(diff == 0 for diff in diffs):
-            continue
-
-        yield tuple(coord + diff for coord, diff in zip(cube, diffs))
-
-
 def simulate(cubes2d: set[Cube2D], n_dims: int, n_cycles: int) -> int:
     # Create the cubes that are initially active for the right dimensionality
     active_cubes = {(x, y) + (0,) * (n_dims - 2) for x, y in cubes2d}
@@ -37,7 +25,7 @@ def simulate(cubes2d: set[Cube2D], n_dims: int, n_cycles: int) -> int:
         neighor_counts = defaultdict(int)
 
         for cube in active_cubes:
-            for neighbor in neighbors(cube):
+            for neighbor in adjacent8(cube):
                 neighor_counts[neighbor] += 1
 
         # Determine which cubes will stay and turn on and update the active cubes
