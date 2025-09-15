@@ -1,5 +1,6 @@
 import time
 from collections.abc import Generator, Iterable, Iterator
+from functools import partial
 from itertools import chain, combinations, product
 from math import floor, log10
 from typing import (
@@ -119,30 +120,36 @@ def directions4(coord: Coord) -> Generator[Direction]:
 
 
 @overload
-def directions8(coord: complex) -> Generator[complex]: ...
-@overload
-def directions8(coord: tuple[int, int]) -> Generator[tuple[int, int]]: ...
-@overload
-def directions8(coord: tuple[int, int, int]) -> Generator[tuple[int, int, int]]: ...
+def directions8(coord: complex, include_zero: bool = False) -> Generator[complex]: ...
 @overload
 def directions8(
-    coord: tuple[int, int, int, int],
+    coord: tuple[int, int], include_zero: bool = False
+) -> Generator[tuple[int, int]]: ...
+@overload
+def directions8(
+    coord: tuple[int, int, int], include_zero: bool = False
+) -> Generator[tuple[int, int, int]]: ...
+@overload
+def directions8(
+    coord: tuple[int, int, int, int], include_zero: bool = False
 ) -> Generator[tuple[int, int, int, int]]: ...
 @overload
-def directions8(coord: tuple[int, ...]) -> Generator[tuple[int, ...]]: ...
+def directions8(
+    coord: tuple[int, ...], include_zero: bool = False
+) -> Generator[tuple[int, ...]]: ...
 
 
-def directions8(coord: Coord) -> Generator[Direction]:
+def directions8(coord: Coord, include_zero: bool = False) -> Generator[Direction]:
     if isinstance(coord, complex):
-        for deltas in product([-1, 0, 1], [-1j, 0j, 1j]):
-            if all(delta == 0 for delta in deltas):
+        for deltas in product([-1j, 0j, 1j], [-1, 0, 1]):
+            if not include_zero and all(delta == 0 for delta in deltas):
                 continue
 
             yield sum(deltas)
 
     elif isinstance(coord, tuple):
         for deltas in product((-1, 0, 1), repeat=len(coord)):
-            if all(delta == 0 for delta in deltas):
+            if not include_zero and all(delta == 0 for delta in deltas):
                 continue
 
             yield deltas
@@ -214,21 +221,25 @@ def adjacent4(coord: Coord) -> Generator[Coord]:
 
 
 @overload
-def adjacent8(coord: complex) -> Generator[complex]: ...
-@overload
-def adjacent8(coord: tuple[int, int]) -> Generator[tuple[int, int]]: ...
-@overload
-def adjacent8(coord: tuple[int, int, int]) -> Generator[tuple[int, int, int]]: ...
+def adjacent8(coord: complex, include_zero: bool = False) -> Generator[complex]: ...
 @overload
 def adjacent8(
-    coord: tuple[int, int, int, int],
+    coord: tuple[int, int], include_zero: bool = False
+) -> Generator[tuple[int, int]]: ...
+@overload
+def adjacent8(
+    coord: tuple[int, int, int], include_zero: bool = False
+) -> Generator[tuple[int, int, int]]: ...
+@overload
+def adjacent8(
+    coord: tuple[int, int, int, int], include_zero: bool = False
 ) -> Generator[tuple[int, int, int, int]]: ...
 @overload
 def adjacent8(coord: tuple[int, ...]) -> Generator[tuple[int, ...]]: ...
 
 
-def adjacent8(coord: Coord) -> Generator[Coord]:
-    return adjacent(coord, directions8)
+def adjacent8(coord: Coord, include_zero: bool = False) -> Generator[Coord]:
+    return adjacent(coord, partial(directions8, include_zero=include_zero))
 
 
 def combinations_xy(iterable: Iterable, rs: range) -> Iterator[tuple]:
