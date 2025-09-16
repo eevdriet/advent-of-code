@@ -3,6 +3,10 @@ curr_year := `date +%Y`
 
 get year=curr_year day=curr_day:
     #!/usr/bin/bash
+    if [[ -z "{{year}}" || -z "{{day}}" ]]; then
+        exit 0
+    fi
+
     source "{{justfile_directory()}}/python/.venv/bin/activate"
 
     INFO_FILE="{{justfile_directory()}}/data/{{year}}/{{day}}.json"
@@ -10,6 +14,10 @@ get year=curr_year day=curr_day:
 
 create year=curr_year day=curr_day +languages='python': (get year day)
     #!/usr/bin/bash
+    if [[ -z "{{year}}" || -z "{{day}}" ]]; then
+        exit 0
+    fi
+
     source "{{justfile_directory()}}/python/.venv/bin/activate"
 
     # Get input, examples and problem statement
@@ -54,25 +62,58 @@ create year=curr_year day=curr_day +languages='python': (get year day)
     rm -f $INFO_FILE
 
 
-test year=curr_year day=curr_day part='1': (create year day)
+test year='' day='': (create year day)
     #!/usr/bin/bash
+    # Go to the invokation directory and determine language from there
     dir="{{invocation_directory()}}"
     cd $dir || exit 1
 
-    padded_day=$(printf "%02d" $((10#{{day}})))
+    declare -A test_dirs
+    test_dirs[rust]="."
+    test_dirs[python]="test"
+
     lang=$(basename $dir)
+
+    find_test_directory() {
+        # Verify whether a test directory exists for the given language
+        if [[ ! -v test_dirs[$lang] ]]; then
+            echo "❌ Unsupported language: $lang"
+            return 1
+        fi
+
+        # Retrieve the base path for the language including the year
+        local dir=${test_dirs[$lang]}
+        [[ -n "{{year}}" ]] && dir="$dir/_{{year}}"
+
+        if [[ -n "{{day}}" ]]; then
+            padded_day=$(printf "%02d" $((10#{{day}})))
+
+            case $lang in
+                python)
+                    dir="$dir/test_$padded_day*"
+                    ;;
+
+                rust)
+                    dir=$(ls $dir | grep -E "^day-$padded_day")
+                    ;;
+            esac
+        fi
+
+        echo $dir
+    }
+
+    test_directory=$(find_test_directory)
 
     case $lang in
         rust)
-            day_folder=$(ls $dir/_{{year}}/ | grep -E "^day-$padded_day")
-            echo "DAY_FO: $day_folder"
-            cargo watch -s "cargo nextest run -p $day_folder"
+            cargo watch -s "cargo nextest run -p $test_directory"
             ;;
         python)
             source "{{justfile_directory()}}/python/.venv/bin/activate"
-            uv run ptw . --now -- test/_{{year}}/test_$padded_day*
+            uv run ptw . --now -- $test_directory
             ;;
         *)
             echo "❌ Unsupported language: $lang"
+            return 1
             ;;
     esac
