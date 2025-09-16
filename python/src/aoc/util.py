@@ -49,8 +49,8 @@ def timed(func: Callable, *args, **kwargs):
     return wrapper(*args, **kwargs) if args or kwargs else wrapper
 
 
-def minmax(*items: list[T]):
-    return min(items), max(items)
+def minmax(a: int, b: int):
+    return min([a, b]), max([a, b])
 
 
 def sign(num: int | float) -> int | float:
@@ -107,7 +107,7 @@ def directions4(coord: tuple[int, ...]) -> Generator[tuple[int, ...]]: ...
 
 def directions4(coord: Coord) -> Generator[Direction]:
     if isinstance(coord, complex):
-        yield from [-1, 1, -1j, 1j]
+        yield from [-1 + 0j, 1 + 0j, -1j, 1j]
 
     elif isinstance(coord, tuple):
         for deltas in product((-1, 0, 1), repeat=len(coord)):
