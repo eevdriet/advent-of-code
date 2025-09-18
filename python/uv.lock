@@ -393,7 +393,7 @@ wheels = [
 
 [[package]]
 name = "templater"
-version = "0.0.0"
+version = "0.1.0"
 source = { editable = "../../templater" }
 
 [[package]]

@@ -3,35 +3,46 @@ from functools import partial
 from itertools import product
 from typing import Callable, overload
 
+from aoc.util.func import pairwise_sum
+
 Coord2D = complex | tuple[int, int]
 Coord = complex | tuple[int, ...]
 Direction = complex | tuple[int, ...]
 
 
 @overload
-def directions4(coord: complex) -> Generator[complex]: ...
-@overload
-def directions4(coord: tuple[int, int]) -> Generator[tuple[int, int]]: ...
-@overload
-def directions4(coord: tuple[int, int, int]) -> Generator[tuple[int, int, int]]: ...
+def directions4(coord: complex, include_zero: bool = False) -> Generator[complex]: ...
 @overload
 def directions4(
-    coord: tuple[int, int, int, int],
+    coord: tuple[int, int], include_zero: bool = False
+) -> Generator[tuple[int, int]]: ...
+@overload
+def directions4(
+    coord: tuple[int, int, int], include_zero: bool = False
+) -> Generator[tuple[int, int, int]]: ...
+@overload
+def directions4(
+    coord: tuple[int, int, int, int], include_zero: bool = False
 ) -> Generator[tuple[int, int, int, int]]: ...
 @overload
-def directions4(coord: tuple[int, ...]) -> Generator[tuple[int, ...]]: ...
+def directions4(
+    coord: tuple[int, ...], include_zero: bool = False
+) -> Generator[tuple[int, ...]]: ...
 
 
-def directions4(coord: Coord) -> Generator[Direction]:
+def directions4(coord: Coord, include_zero: bool = False) -> Generator[Direction]:
     if isinstance(coord, complex):
-        yield from [-1 + 0j, 1 + 0j, -1j, 1j]
+        yield from [-1 + 0j, 1 + 0j, -1j, 1j] + ([0j] if include_zero else [])
 
     elif isinstance(coord, tuple):
         for deltas in product((-1, 0, 1), repeat=len(coord)):
-            if sum(delta != 0 for delta in deltas) != 1:
-                continue
-
-            yield deltas
+            match sum(delta != 0 for delta in deltas):
+                case 1:
+                    yield deltas
+                case 0 if len(coord) and include_zero:
+                    yield deltas
+                case _:
+                    continue
     else:
         raise TypeError(f"Unsupported coordinate type: {type(coord)}")
 
@@ -120,21 +131,27 @@ def adjacent(
 
 
 @overload
-def adjacent4(coord: complex) -> Generator[complex]: ...
-@overload
-def adjacent4(coord: tuple[int, int]) -> Generator[tuple[int, int]]: ...
-@overload
-def adjacent4(coord: tuple[int, int, int]) -> Generator[tuple[int, int, int]]: ...
+def adjacent4(coord: complex, include_zero: bool = False) -> Generator[complex]: ...
 @overload
 def adjacent4(
-    coord: tuple[int, int, int, int],
+    coord: tuple[int, int], include_zero: bool = False
+) -> Generator[tuple[int, int]]: ...
+@overload
+def adjacent4(
+    coord: tuple[int, int, int], include_zero: bool = False
+) -> Generator[tuple[int, int, int]]: ...
+@overload
+def adjacent4(
+    coord: tuple[int, int, int, int], include_zero: bool = False
 ) -> Generator[tuple[int, int, int, int]]: ...
 @overload
-def adjacent4(coord: tuple[int, ...]) -> Generator[tuple[int, ...]]: ...
+def adjacent4(
+    coord: tuple[int, ...], include_zero: bool = False
+) -> Generator[tuple[int, ...]]: ...
 
 
-def adjacent4(coord: Coord) -> Generator[Coord]:
-    return adjacent(coord, directions4)
+def adjacent4(coord: Coord, include_zero: bool = False) -> Generator[Coord]:
+    return adjacent(coord, partial(directions4, include_zero=include_zero))
 
 
 @overload

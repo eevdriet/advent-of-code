@@ -2,12 +2,14 @@ from collections import defaultdict
 from itertools import combinations
 from typing import TextIO
 
-from aoc.io import FileType, open_file
-from aoc.util import Point, pairwise_sum
 from attrs import define
+
+from aoc.io import FileType, open_file
 
 YEAR = 2024
 DAY = 8
+
+Point = tuple[int, int]
 
 
 @define

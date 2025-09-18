@@ -6,4 +6,4 @@ def find_num(line: str) -> int:
 
 
 def find_nums(line: str) -> list[int]:
-    return list(map(int, re.findall(r"(\d+)", line)))
+    return list(map(int, re.findall(r"([-+]?\d+)", line)))

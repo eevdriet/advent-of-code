@@ -1,5 +1,6 @@
 import sys
-from typing import Literal
+from math import gcd
+from typing import Callable, Literal
 
 from attrs import define
 
@@ -12,77 +13,80 @@ Instruction = Literal["L"] | Literal["R"] | int
 @define
 class MonkeyMap:
     tiles: dict[complex, str]
-    start: complex
+    n_rows: int
+    n_cols: int
 
     @classmethod
     def parse(cls, text: str) -> "MonkeyMap":
-        tiles = {}
-        start = -1j
+        tiles = {
+            (x + y * 1j): tile
+            for y, line in enumerate(text.splitlines())
+            for x, tile in enumerate(line)
+            if tile in [".", "#"]
+        }
+        n_rows = max(int(coord.imag) for coord in tiles) + 1
+        n_cols = max(int(coord.real) for coord in tiles) + 1
 
-        for y, line in enumerate(text.splitlines()):
-            for x, tile in enumerate(line):
-                coord = complex(x, y)
+        return cls(tiles, n_rows, n_cols)
 
-                if tile == " ":
-                    continue
-
-                if start.imag < 0:
-                    start = coord
-
-                tiles[coord] = tile
-
-        return cls(tiles, start)
-
-    @property
-    def n_rows(self):
-        return max(int(coord.imag) for coord in self.tiles) + 1
-
-    @property
-    def n_cols(self):
-        return max(int(coord.real) for coord in self.tiles) + 1
-
-    def find_next(self, coord: complex, dir: complex) -> complex:
-        # Determine the next coordinate and return right away if it exists
-        ncoord = coord + dir
-
-        if ncoord in self.tiles:
-            return ncoord
-
+    def wrap2d(self, coord: complex, dir: complex) -> tuple[complex, complex]:
         # Otherwise, find the first coordinate on the other side of the map
-        col = int(coord.real)
-        row = int(coord.imag)
+        x = int(coord.real)
+        y = int(coord.imag)
 
         match dir:
-            # Right
             case 1:
-                return next(
-                    complex(c, row)
-                    for c in range(self.n_cols)
-                    if complex(c, row) in self.tiles
-                )
-            # Left
+                return complex((x + 1) % self.n_cols, y), dir
             case -1:
-                return next(
-                    complex(c, row)
-                    for c in reversed(range(self.n_cols))
-                    if complex(c, row) in self.tiles
-                )
-            # Down
+                return complex((x - 1) % self.n_cols, y), dir
             case 1j:
-                return next(
-                    complex(col, r)
-                    for r in range(self.n_rows)
-                    if complex(col, r) in self.tiles
-                )
-            # Up
+                return complex(x, (y + 1) % self.n_rows), dir
             case -1j:
-                return next(
-                    complex(col, r)
-                    for r in reversed(range(self.n_rows))
-                    if complex(col, r) in self.tiles
-                )
+                return complex(x, (y - 1) % self.n_rows), dir
+
             case _:
-                raise ValueError(f"Found invalid direction '{dir}'")
+                raise ValueError(f"Found invalid wrapping direction '{dir}'")
+
+    def wrap3d(self, coord: complex, dir: complex) -> tuple[complex, complex]:
+        x = int(coord.real)
+        y = int(coord.imag)
+        face_size = gcd(self.n_cols, self.n_rows)
+
+        face_x = x // face_size
+        face_y = y // face_size
+
+        match dir, x // 50, y // 50:
+            case 1j, 0, _:
+                return complex(149 - x, 99), -1j
+            case 1j, 1, _:
+                return complex(49, x + 50), -1
+            case 1j, 2, _:
+                return complex(149 - x, 149), -1j
+            case 1j, 3, _:
+                return complex(149, x - 100), -1
+            case -1j, 0, _:
+                return complex(149 - x, 0), 1j
+            case -1j, 1, _:
+                return complex(100, x - 50), 1
+            case -1j, 2, _:
+                return complex(149 - x, 50), 1j
+            case -1j, 3, _:
+                return complex(0, x - 100), 1
+            case 1, _, 0:
+                return complex(0, y + 100), 1
+            case 1, _, 1:
+                return complex(100 + y, 49), -1j
+            case 1, _, 2:
+                return complex(-50 + y, 99), -1j
+            case -1, _, 0:
+                return complex(50 + y, 50), 1j
+            case -1, _, 1:
+                return complex(100 + y, 0), 1j
+            case -1, _, 2:
+                return complex(199, y - 100), -1
+
+            case _:
+                raise ValueError(f"Found invalid wrapping key {(dir, face_x, face_y)}")
 
 
 def parse(input: str) -> tuple[MonkeyMap, list[Instruction]]:
@@ -110,34 +114,51 @@ def parse(input: str) -> tuple[MonkeyMap, list[Instruction]]:
     return map, instructions
 
 
+def follow_instructions(
+    map: MonkeyMap, instructions: list[Instruction], wrap: Callable
+) -> int:
+    with open("out.txt", "w") as file:
+        coord = min(
+            (
+                coord
+                for coord, tile in map.tiles.items()
+                if coord.imag == 0 and tile == "."
+            ),
+            key=lambda tile: tile.real,
+        )
+        dir = 1
+
+        for instruction in instructions:
+            match instruction:
+                case "L":
+                    dir *= -1j
+                case "R":
+                    dir *= 1j
+
+                case n_steps:
+                    for _ in range(n_steps):
+                        ncoord, ndir = coord + dir, dir
+
+                        if ncoord not in map.tiles:
+                            ncoord, ndir = wrap(map, ncoord, ndir)
+
+                        if map.tiles[ncoord] == ".":
+                            coord, dir = ncoord, ndir
+
+        # Compute the password
+        row = int(coord.imag) + 1
+        col = int(coord.real) + 1
+        dir_num = {1: 0, 1j: 1, -1: 2, -1j: 3}
+
+        return 1000 * row + 4 * col + dir_num[dir]
+
+
 def part1(map: MonkeyMap, instructions: list[Instruction]) -> int:
-    coord = map.start
-    dir = 1
-
-    for instruction in instructions:
-        match instruction:
-            case "L":
-                dir *= -1j
-            case "R":
-                dir *= 1j
-            case n_steps:
-                for _ in range(n_steps):
-                    ncoord = map.find_next(coord, dir)
-                    if map.tiles[ncoord] == "#":
-                        break
-
-                    coord = ncoord
-
-    # Compute the password
-    row = int(coord.imag) + 1
-    col = int(coord.real) + 1
-    dir_num = {1: 0, 1j: 1, -1: 2, -1j: 3}
-
-    return 1000 * row + 4 * col + dir_num[dir]
+    return follow_instructions(map, instructions, MonkeyMap.wrap2d)
 
 
 def part2(map: MonkeyMap, instructions: list[Instruction]) -> int:
-    return 0
+    return follow_instructions(map, instructions, MonkeyMap.wrap3d)
 
 
 def main():
@@ -152,5 +173,5 @@ def main():
 
 
 if __name__ == "__main__":
-    example = read_file(2022, 22, "example")
-    part1(*parse(example))
+    example = read_file(2022, 22)
+    part2(*parse(example))
