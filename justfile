@@ -3,17 +3,29 @@ curr_year := `date +%Y`
 
 get year=curr_year day=curr_day:
     #!/usr/bin/bash
+    echo "GET"
+
     if [[ -z "{{year}}" || -z "{{day}}" ]]; then
         exit 0
     fi
 
-    source "{{justfile_directory()}}/python/.venv/bin/activate"
+    padded_day=$(printf "%02d" $((10#{{day}})))
+    INPUT_FILE="{{justfile_directory()}}/data/{{year}}/$padded_day.input"
 
-    INFO_FILE="{{justfile_directory()}}/data/{{year}}/{{day}}.json"
+    if [[ -f "$INPUT_FILE" ]]; then
+        echo "Already have info file"
+        exit 0
+    fi
+
+    INFO_FILE="{{justfile_directory()}}/data/{{year}}/$padded_day.json"
+
+    source "{{justfile_directory()}}/python/.venv/bin/activate"
     python "{{justfile_directory()}}/scripts/get_input.py" --day {{day}} --year {{year}} > $INFO_FILE
 
 create year=curr_year day=curr_day +languages='python': (get year day)
     #!/usr/bin/bash
+    echo "CREATE"
+
     if [[ -z "{{year}}" || -z "{{day}}" ]]; then
         exit 0
     fi
@@ -24,7 +36,8 @@ create year=curr_year day=curr_day +languages='python': (get year day)
     just get {{year}} {{day}}
 
     # Extract additional information
-    INFO_FILE="{{justfile_directory()}}/data/{{year}}/{{day}}.json"
+    padded_day=$(printf "%02d" $((10#{{day}})))
+    INFO_FILE="{{justfile_directory()}}/data/{{year}}/$padded_day.json"
 
     padded_day=$(jq -r .padded_day $INFO_FILE)
     title=$(jq -r .title $INFO_FILE)
@@ -58,8 +71,7 @@ create year=curr_year day=curr_day +languages='python': (get year day)
         esac
     done
 
-    # Remove information file
-    rm -f $INFO_FILE
+    rm -rf INFO_FILE
 
 
 test year='' day='': (create year day)

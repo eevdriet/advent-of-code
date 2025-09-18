@@ -16,8 +16,8 @@ def create_py_files(patterns: dict):
 
     sources = [TEMPLATE_PATH / "problem.py", TEMPLATE_PATH / "test.py"]
     destinations = [
-        ROOT_PATH / "python" / "src" / f'_{patterns["year"]}' / f"day_{stem}",
-        ROOT_PATH / "python" / "test" / f"_{patterns["year"]}" / f"test_{stem}",
+        ROOT_PATH / "python" / "src" / f"_{patterns['year']}" / f"day_{stem}",
+        ROOT_PATH / "python" / "test" / f"_{patterns['year']}" / f"test_{stem}",
     ]
 
     for src, dst in zip(sources, destinations):
@@ -37,7 +37,7 @@ if __name__ == "__main__":
         print(f"No template defined for {language}")
         sys.exit(1)
 
-    info_path = DATA_PATH / f"{year}" / f"{day}.json"
+    info_path = DATA_PATH / f"{year}" / f"{int(day):02}.json"
     if not info_path.exists():
         print(f"Path with problem information {info_path} doesn't exist")
         sys.exit(1)

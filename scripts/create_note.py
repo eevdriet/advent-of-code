@@ -53,7 +53,7 @@ def main():
     languages = sys.argv[3:]
 
     # Load information about the problem
-    info_path = DATA_PATH / f"{year}" / f"{day}.json"
+    info_path = DATA_PATH / f"{year}" / f"{int(day):02}.json"
     if not info_path.exists():
         print(f"Path with problem information {info_path} doesn't exist")
         sys.exit(1)
@@ -65,7 +65,7 @@ def main():
         print(f"Could read JSON file {file.read()}")
         sys.exit(1)
 
-    info["aoc_date"] = f"{info["year"]}-12-{info["padded_day"]}"
+    info["aoc_date"] = f"{info['year']}-12-{info['padded_day']}"
 
     # Alias each problem with its index
     info["aliases"] = props_list([info["title"], f"Advent of code {year} #{day}"])
