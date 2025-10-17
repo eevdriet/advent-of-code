@@ -19,18 +19,17 @@ get year=curr_year day=curr_day:
 
     INFO_FILE="{{justfile_directory()}}/data/{{year}}/$padded_day.json"
 
-    source "{{justfile_directory()}}/python/.venv/bin/activate"
-    python "{{justfile_directory()}}/scripts/get_input.py" --day {{day}} --year {{year}} > $INFO_FILE
+    source python/.venv/bin/activate
+    python "{{justfile_directory()}}/scripts/get_input.py" --day {{day}} --year {{year}} --out $INFO_FILE
 
 create year=curr_year day=curr_day +languages='python': (get year day)
     #!/usr/bin/bash
-    echo "CREATE"
 
     if [[ -z "{{year}}" || -z "{{day}}" ]]; then
         exit 0
     fi
 
-    source "{{justfile_directory()}}/python/.venv/bin/activate"
+    source python/.venv/bin/activate
 
     # Get input, examples and problem statement
     just get {{year}} {{day}}

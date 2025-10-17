@@ -5,7 +5,7 @@ use std::str::FromStr;
 pub enum File {
     Input(u32, u32),
     Example(u32, u32),
-    Custom(u32, u32, String),
+    ExampleN(u32, u32, u32),
 }
 
 impl File {
@@ -20,7 +20,7 @@ impl File {
         base.push(match &self {
             File::Input(year, day) => format!("{year}/{day}.input"),
             File::Example(year, day) => format!("{year}/{day}.example"),
-            File::Custom(year, day, format) => format!("{year}/{day}.{format}"),
+            File::ExampleN(year, day, n) => format!("{year}/{day}.example{n}"),
         });
 
         base

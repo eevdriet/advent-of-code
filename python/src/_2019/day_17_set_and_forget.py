@@ -18,7 +18,7 @@ Routine = list[str]
 
 
 @define
-class Image(dict):
+class Image(dict[complex, str]):
     dir: complex
     start: complex
 
@@ -43,7 +43,7 @@ class Image(dict):
         start = pos
         dir = 0j
 
-        image = {}
+        image: dict[complex, str] = {}
 
         for cell in program.run():
             image[pos] = chr(cell)
@@ -66,7 +66,7 @@ class Image(dict):
         return img
 
     def clean_path(self) -> list[str]:
-        path = []
+        path: list[str] = []
         coord = self.start
         dir = self.dir
 

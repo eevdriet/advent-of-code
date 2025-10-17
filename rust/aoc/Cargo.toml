@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 miette.workspace = true
 nom.workspace = true
+anyhow.workspace = true

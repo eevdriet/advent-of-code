@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from argparse import Namespace
 from datetime import date
 from pathlib import Path
 
@@ -27,6 +28,7 @@ class MarkdownConverter(HTML2Text):
 
 
 def fetch_input(year: int, day: int):
+    print("HEADERS", HEADERS)
     # Fetch the input text
     URL = f"https://adventofcode.com/{year}/day/{day}/input"
     response = requests.get(URL, headers=HEADERS)
@@ -34,14 +36,13 @@ def fetch_input(year: int, day: int):
 
     # If valid, save to the correct file
     padded_day = f"{day:02}"
+    INPUT_FILE = DATA_PATH / f"{year}" / f"{padded_day}.input"
 
-    with open(
-        DATA_PATH / f"{year}" / f"{padded_day}.input", "w", encoding="utf-8"
-    ) as file:
+    with open(INPUT_FILE, "w", encoding="utf-8") as file:
         file.write(response.text.strip())
 
 
-def fetch_problem(year: int, day: int, fetch_part2: bool = True):
+def fetch_problem(year: int, day: int, fetch_part2: bool = True) -> str | None:
     # Fetch the problem statement
     URL = f"https://adventofcode.com/{year}/day/{day}"
     response = requests.get(URL, headers=HEADERS)
@@ -112,12 +113,16 @@ def main():
     parser.add_argument("--day", type=int, default=today.day)
     parser.add_argument("--year", type=int, default=today.year)
     parser.add_argument("--part-2", type=bool, default=True)
-    args = parser.parse_args()
+    parser.add_argument("--out", type=str)
+    args: Namespace = parser.parse_args()
 
     # Retrieve input and example files for the given problem
     fetch_input(args.year, args.day)
 
-    print(fetch_problem(args.year, args.day))
+    info = fetch_problem(args.year, args.day)
+    if info:
+        with open(args.out, "w", encoding="utf-8") as file:
+            file.write(info)
 
 
 if __name__ == "__main__":
